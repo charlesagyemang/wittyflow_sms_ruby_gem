@@ -10,15 +10,15 @@ Gem::Specification.new do |spec|
 
   spec.summary       = "Send Sms To Any Number In Ghana Using Wittyflow"
   spec.description   = "Send Sms To Any Number In Ghana Using Wittyflow"
-  spec.homepage      = "https://wittyflow.com"
+  spec.homepage      = "https://github.com/charlesagyemang/wittyflow_sms_ruby_gem"
   spec.license       = "MIT"
   spec.required_ruby_version = ">= 2.0.0"
 
-  spec.metadata["allowed_push_host"] = "https://mygemserver.com"
+  spec.metadata["allowed_push_host"] = "https://github.com/charlesagyemang/wittyflow_sms_ruby_gem"
 
-  spec.metadata["homepage_uri"] = "https://wittyflow.com"
-  spec.metadata["source_code_uri"] = "https://wittyflow.com"
-  spec.metadata["changelog_uri"] = "https://wittyflow.com"
+  spec.metadata["homepage_uri"] = "https://github.com/charlesagyemang/wittyflow_sms_ruby_gem"
+  spec.metadata["source_code_uri"] = "https://github.com/charlesagyemang/wittyflow_sms_ruby_gem"
+  spec.metadata["changelog_uri"] = "https://github.com/charlesagyemang/wittyflow_sms_ruby_gem"
 
   # Specify which files should be added to the gem when it is released.
   # The `git ls-files -z` loads the files in the RubyGem that have been added into git.
