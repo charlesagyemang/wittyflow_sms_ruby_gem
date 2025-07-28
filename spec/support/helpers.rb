@@ -23,16 +23,16 @@ module SpecHelpers
 
   def mock_successful_response(data = {})
     {
-      status: "success",
-      message: "Request processed successfully",
-      data: data
+      "status" => "success",
+      "message" => "Request processed successfully",
+      "data" => data
     }
   end
 
   def mock_error_response(message = "An error occurred")
     {
-      status: "error",
-      message: message
+      "status" => "error",
+      "message" => message
     }
   end
 
@@ -51,7 +51,7 @@ module SpecHelpers
 
   def stub_wittyflow_request(method, endpoint, response_body: {}, status: 200, headers: {})
     url = "https://api.wittyflow.com/v1#{endpoint}"
-    
+
     default_headers = {
       "Content-Type" => "application/json"
     }.merge(headers)

@@ -1,5 +1,8 @@
 # frozen_string_literal: true
 
+require "net/http"
+require "timeout"
+
 module Wittyflow
   class Client
     include HTTParty
@@ -28,10 +31,10 @@ module Wittyflow
     # Check SMS delivery status
     def message_status(message_id)
       validate_presence!(:message_id, message_id)
-      
+
       url = "#{config.api_endpoint}/messages/#{message_id}/retrieve"
       params = auth_params
-      
+
       with_error_handling do
         response = self.class.get(url, query: params, timeout: config.timeout)
         parse_response(response)
@@ -42,7 +45,7 @@ module Wittyflow
     def account_balance
       url = "#{config.api_endpoint}/account/balance"
       params = auth_params
-      
+
       with_error_handling do
         response = self.class.get(url, query: params, timeout: config.timeout)
         parse_response(response)
@@ -54,9 +57,9 @@ module Wittyflow
       validate_presence!(:from, from)
       validate_presence!(:to, to)
       validate_presence!(:message, message)
-      
+
       recipients = Array(to).map { |phone| format_phone_number(phone) }
-      
+
       recipients.map do |recipient|
         send_message(from: from, to: recipient, message: message, type: type)
       end
@@ -78,10 +81,10 @@ module Wittyflow
     def setup_httparty
       self.class.base_uri config.api_endpoint
       self.class.headers({
-        "Content-Type" => "application/json",
-        "Accept" => "application/json",
-        "User-Agent" => "Wittyflow Ruby Gem #{Wittyflow::VERSION}"
-      })
+                           "Content-Type" => "application/x-www-form-urlencoded",
+                           "Accept" => "application/json",
+                           "User-Agent" => "Wittyflow Ruby Gem #{Wittyflow::VERSION}"
+                         })
     end
 
     def validate_credentials!
@@ -99,7 +102,7 @@ module Wittyflow
       validate_presence!(:message, message)
 
       formatted_to = format_phone_number(to)
-      
+
       body = {
         from: from.to_s,
         to: formatted_to,
@@ -110,7 +113,7 @@ module Wittyflow
       }
 
       url = "#{config.api_endpoint}/messages/send"
-      
+
       with_error_handling do
         response = self.class.post(url, body: body, timeout: config.timeout)
         parse_response(response)
@@ -119,10 +122,10 @@ module Wittyflow
 
     def format_phone_number(phone)
       phone_str = phone.to_s.strip
-      
+
       # Remove any non-digit characters except +
       phone_str = phone_str.gsub(/[^\d+]/, "")
-      
+
       # Handle different phone number formats
       case phone_str
       when /^\+233/ # International format for Ghana
@@ -148,16 +151,19 @@ module Wittyflow
       begin
         attempts += 1
         yield
-      rescue Net::TimeoutError, Net::OpenTimeout, Net::ReadTimeout => e
+      rescue Net::OpenTimeout, Net::ReadTimeout, Net::WriteTimeout, Timeout::Error => e
         raise NetworkError, "Network timeout: #{e.message}"
       rescue HTTParty::Error, SocketError => e
-        if attempts < config.retries
-          config.logger&.warn("Request failed (attempt #{attempts}/#{config.retries}), retrying in #{config.retry_delay}s: #{e.message}")
-          sleep(config.retry_delay)
-          retry
-        else
+        unless attempts < config.retries
           raise NetworkError, "Network error after #{config.retries} attempts: #{e.message}"
         end
+
+        config.logger&.warn("Request failed (attempt #{attempts}/#{config.retries}), retrying in #{config.retry_delay}s: #{e.message}")
+        sleep(config.retry_delay)
+        retry
+      rescue Wittyflow::Error => e
+        # Re-raise our custom errors without modification
+        raise e
       rescue StandardError => e
         raise APIError, "Unexpected error: #{e.message}"
       end

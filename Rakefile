@@ -18,7 +18,7 @@ rescue LoadError
 end
 
 desc "Run all quality checks"
-task quality: [:rubocop, :spec]
+task quality: %i[rubocop spec]
 
 desc "Generate test coverage report"
 task :coverage do

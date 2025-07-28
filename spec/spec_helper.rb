@@ -6,9 +6,9 @@ if ENV["COVERAGE"]
   SimpleCov.start do
     add_filter "/spec/"
     add_filter "/vendor/"
-    
+
     add_group "Library", "lib"
-    
+
     minimum_coverage 90
     enable_coverage :branch
   end
@@ -27,9 +27,9 @@ VCR.configure do |config|
   config.configure_rspec_metadata!
   config.default_cassette_options = {
     record: :once,
-    match_requests_on: [:method, :uri, :body]
+    match_requests_on: %i[method uri body]
   }
-  
+
   # Filter sensitive data
   config.filter_sensitive_data("<APP_ID>") { ENV["WITTYFLOW_APP_ID"] || "test_app_id" }
   config.filter_sensitive_data("<APP_SECRET>") { ENV["WITTYFLOW_APP_SECRET"] || "test_app_secret" }
@@ -56,7 +56,7 @@ RSpec.configure do |config|
   # Allow focusing on specific tests
   config.filter_run_when_matching :focus
 
-  config.before(:each) do
+  config.before do
     # Reset configuration before each test
     Wittyflow.configuration = nil
   end

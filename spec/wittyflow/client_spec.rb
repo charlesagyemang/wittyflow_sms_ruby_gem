@@ -1,10 +1,10 @@
 # frozen_string_literal: true
 
 RSpec.describe Wittyflow::Client do
+  subject(:client) { described_class.new(app_id: app_id, app_secret: app_secret) }
+
   let(:app_id) { valid_app_id }
   let(:app_secret) { valid_app_secret }
-  
-  subject(:client) { described_class.new(app_id: app_id, app_secret: app_secret) }
 
   describe "#initialize" do
     context "with valid credentials" do
@@ -22,6 +22,8 @@ RSpec.describe Wittyflow::Client do
     end
 
     context "with custom options" do
+      subject(:client) { described_class.new(app_id: app_id, app_secret: app_secret, **custom_options) }
+
       let(:custom_options) do
         {
           timeout: 60,
@@ -29,8 +31,6 @@ RSpec.describe Wittyflow::Client do
           api_endpoint: "https://custom.api.com/v1"
         }
       end
-
-      subject(:client) { described_class.new(app_id: app_id, app_secret: app_secret, **custom_options) }
 
       it "uses custom configuration values" do
         expect(client.config.timeout).to eq(60)
@@ -60,21 +60,21 @@ RSpec.describe Wittyflow::Client do
 
     context "with missing credentials" do
       it "raises ConfigurationError when app_id is missing" do
-        expect {
+        expect do
           described_class.new(app_secret: app_secret)
-        }.to raise_error(Wittyflow::ConfigurationError, "app_id is required")
+        end.to raise_error(Wittyflow::ConfigurationError, "app_id is required")
       end
 
       it "raises ConfigurationError when app_secret is missing" do
-        expect {
+        expect do
           described_class.new(app_id: app_id)
-        }.to raise_error(Wittyflow::ConfigurationError, "app_secret is required")
+        end.to raise_error(Wittyflow::ConfigurationError, "app_secret is required")
       end
 
       it "raises ConfigurationError when app_id is empty" do
-        expect {
+        expect do
           described_class.new(app_id: "", app_secret: app_secret)
-        }.to raise_error(Wittyflow::ConfigurationError, "app_id is required")
+        end.to raise_error(Wittyflow::ConfigurationError, "app_id is required")
       end
     end
   end
@@ -83,7 +83,7 @@ RSpec.describe Wittyflow::Client do
     let(:from) { "WittyFlow" }
     let(:to) { valid_phone_number }
     let(:message) { sample_message }
-    let(:response_body) { mock_successful_response(message_id: "msg_123") }
+    let(:response_body) { mock_successful_response("message_id" => "msg_123") }
 
     before do
       stub_wittyflow_request(:post, "/messages/send", response_body: response_body)
@@ -100,17 +100,16 @@ RSpec.describe Wittyflow::Client do
     end
 
     it "includes correct parameters in request" do
-      expected_body = {
-        from: from,
-        to: formatted_phone_number,
-        message: message,
-        type: 1,
-        app_id: app_id,
-        app_secret: app_secret
-      }
-
       stub = stub_request(:post, "https://api.wittyflow.com/v1/messages/send")
-        .with(body: expected_body)
+        .with do |request|
+          body_params = URI.decode_www_form(request.body).to_h
+          body_params["from"] == from &&
+            body_params["to"] == formatted_phone_number &&
+            body_params["message"] == message &&
+            body_params["type"] == "1" &&
+            body_params["app_id"] == app_id &&
+            body_params["app_secret"] == app_secret
+        end
         .to_return(status: 200, body: response_body.to_json)
 
       client.send_sms(from: from, to: to, message: message)
@@ -119,21 +118,21 @@ RSpec.describe Wittyflow::Client do
 
     context "with validation errors" do
       it "raises ValidationError when from is missing" do
-        expect {
+        expect do
           client.send_sms(from: nil, to: to, message: message)
-        }.to raise_error(Wittyflow::ValidationError, "from is required")
+        end.to raise_error(Wittyflow::ValidationError, "from is required")
       end
 
       it "raises ValidationError when to is missing" do
-        expect {
+        expect do
           client.send_sms(from: from, to: nil, message: message)
-        }.to raise_error(Wittyflow::ValidationError, "to is required")
+        end.to raise_error(Wittyflow::ValidationError, "to is required")
       end
 
       it "raises ValidationError when message is missing" do
-        expect {
+        expect do
           client.send_sms(from: from, to: to, message: nil)
-        }.to raise_error(Wittyflow::ValidationError, "message is required")
+        end.to raise_error(Wittyflow::ValidationError, "message is required")
       end
     end
   end
@@ -142,7 +141,7 @@ RSpec.describe Wittyflow::Client do
     let(:from) { "WittyFlow" }
     let(:to) { valid_phone_number }
     let(:message) { sample_message }
-    let(:response_body) { mock_successful_response(message_id: "msg_123") }
+    let(:response_body) { mock_successful_response("message_id" => "msg_123") }
 
     before do
       stub_wittyflow_request(:post, "/messages/send", response_body: response_body)
@@ -154,17 +153,16 @@ RSpec.describe Wittyflow::Client do
     end
 
     it "sets type to 0 for flash SMS" do
-      expected_body = {
-        from: from,
-        to: formatted_phone_number,
-        message: message,
-        type: 0,
-        app_id: app_id,
-        app_secret: app_secret
-      }
-
       stub = stub_request(:post, "https://api.wittyflow.com/v1/messages/send")
-        .with(body: expected_body)
+        .with do |request|
+          body_params = URI.decode_www_form(request.body).to_h
+          body_params["from"] == from &&
+            body_params["to"] == formatted_phone_number &&
+            body_params["message"] == message &&
+            body_params["type"] == "0" &&
+            body_params["app_id"] == app_id &&
+            body_params["app_secret"] == app_secret
+        end
         .to_return(status: 200, body: response_body.to_json)
 
       client.send_flash_sms(from: from, to: to, message: message)
@@ -174,10 +172,11 @@ RSpec.describe Wittyflow::Client do
 
   describe "#message_status" do
     let(:message_id) { "msg_123" }
-    let(:response_body) { mock_successful_response(status: "delivered") }
+    let(:response_body) { mock_successful_response("status" => "delivered") }
 
     before do
-      stub_wittyflow_request(:get, "/messages/#{message_id}/retrieve?app_id=#{app_id}&app_secret=#{app_secret}", response_body: response_body)
+      stub_wittyflow_request(:get, "/messages/#{message_id}/retrieve?app_id=#{app_id}&app_secret=#{app_secret}",
+                             response_body: response_body)
     end
 
     it "retrieves message status successfully" do
@@ -186,17 +185,18 @@ RSpec.describe Wittyflow::Client do
     end
 
     it "raises ValidationError when message_id is missing" do
-      expect {
+      expect do
         client.message_status(nil)
-      }.to raise_error(Wittyflow::ValidationError, "message_id is required")
+      end.to raise_error(Wittyflow::ValidationError, "message_id is required")
     end
   end
 
   describe "#account_balance" do
-    let(:response_body) { mock_successful_response(balance: 100.50, currency: "GHS") }
+    let(:response_body) { mock_successful_response("balance" => 100.50, "currency" => "GHS") }
 
     before do
-      stub_wittyflow_request(:get, "/account/balance?app_id=#{app_id}&app_secret=#{app_secret}", response_body: response_body)
+      stub_wittyflow_request(:get, "/account/balance?app_id=#{app_id}&app_secret=#{app_secret}",
+                             response_body: response_body)
     end
 
     it "retrieves account balance successfully" do
@@ -207,9 +207,9 @@ RSpec.describe Wittyflow::Client do
 
   describe "#send_bulk_sms" do
     let(:from) { "WittyFlow" }
-    let(:recipients) { ["0241234567", "0241234568", "0241234569"] }
+    let(:recipients) { %w[0241234567 0241234568 0241234569] }
     let(:message) { sample_message }
-    let(:response_body) { mock_successful_response(message_id: "msg_123") }
+    let(:response_body) { mock_successful_response("message_id" => "msg_123") }
 
     before do
       stub_wittyflow_request(:post, "/messages/send", response_body: response_body)
@@ -219,7 +219,7 @@ RSpec.describe Wittyflow::Client do
       result = client.send_bulk_sms(from: from, to: recipients, message: message)
       expect(result).to be_an(Array)
       expect(result.length).to eq(3)
-      expect(result.all? { |r| r == response_body }).to be true
+      expect(result.all?(response_body)).to be true
     end
 
     it "works with single recipient" do
@@ -267,9 +267,9 @@ RSpec.describe Wittyflow::Client do
       end
 
       it "raises AuthenticationError" do
-        expect {
+        expect do
           client.send_sms(from: from, to: to, message: message)
-        }.to raise_error(Wittyflow::AuthenticationError, "Invalid app_id or app_secret")
+        end.to raise_error(Wittyflow::AuthenticationError, "Invalid app_id or app_secret")
       end
     end
 
@@ -281,9 +281,9 @@ RSpec.describe Wittyflow::Client do
       end
 
       it "raises ValidationError with API message" do
-        expect {
+        expect do
           client.send_sms(from: from, to: to, message: message)
-        }.to raise_error(Wittyflow::ValidationError, "Invalid phone number")
+        end.to raise_error(Wittyflow::ValidationError, "Invalid phone number")
       end
     end
 
@@ -293,9 +293,9 @@ RSpec.describe Wittyflow::Client do
       end
 
       it "raises APIError for rate limiting" do
-        expect {
+        expect do
           client.send_sms(from: from, to: to, message: message)
-        }.to raise_error(Wittyflow::APIError, "Rate limit exceeded")
+        end.to raise_error(Wittyflow::APIError, "Rate limit exceeded")
       end
     end
 
@@ -305,9 +305,9 @@ RSpec.describe Wittyflow::Client do
       end
 
       it "raises APIError for server error" do
-        expect {
+        expect do
           client.send_sms(from: from, to: to, message: message)
-        }.to raise_error(Wittyflow::APIError, "Server error (500)")
+        end.to raise_error(Wittyflow::APIError, "Server error (500)")
       end
     end
 
@@ -318,21 +318,27 @@ RSpec.describe Wittyflow::Client do
       end
 
       it "raises NetworkError" do
-        expect {
+        expect do
           client.send_sms(from: from, to: to, message: message)
-        }.to raise_error(Wittyflow::NetworkError, /Network timeout/)
+        end.to raise_error(Wittyflow::NetworkError, /Network timeout/)
       end
     end
 
     context "when network error with retries" do
-      let(:client_with_retries) { described_class.new(app_id: app_id, app_secret: app_secret, retries: 2, retry_delay: 0) }
+      let(:client_with_retries) do
+        described_class.new(app_id: app_id, app_secret: app_secret, retries: 3, retry_delay: 0)
+      end
 
       before do
         stub_request(:post, "https://api.wittyflow.com/v1/messages/send")
           .to_raise(SocketError.new("Connection failed"))
           .times(2)
           .then
-          .to_return(status: 200, body: mock_successful_response.to_json)
+          .to_return(
+            status: 200,
+            body: mock_successful_response.to_json,
+            headers: { "Content-Type" => "application/json" }
+          )
       end
 
       it "retries on network errors and eventually succeeds" do

@@ -1,10 +1,10 @@
 # frozen_string_literal: true
 
 RSpec.describe Wittyflow::Sms do
+  subject(:sms) { described_class.new(app_id, app_secret) }
+
   let(:app_id) { valid_app_id }
   let(:app_secret) { valid_app_secret }
-  
-  subject(:sms) { described_class.new(app_id, app_secret) }
 
   describe "#initialize" do
     it "shows deprecation warning" do
@@ -21,7 +21,7 @@ RSpec.describe Wittyflow::Sms do
     let(:sender) { "WittyFlow" }
     let(:receiver) { valid_phone_number }
     let(:message) { sample_message }
-    let(:response) { mock_successful_response(message_id: "msg_123") }
+    let(:response) { mock_successful_response("message_id" => "msg_123") }
 
     before do
       allow_any_instance_of(Wittyflow::Client).to receive(:send_sms).and_return(response)
@@ -42,7 +42,7 @@ RSpec.describe Wittyflow::Sms do
     let(:sender) { "WittyFlow" }
     let(:receiver) { valid_phone_number }
     let(:message) { sample_message }
-    let(:response) { mock_successful_response(message_id: "msg_123") }
+    let(:response) { mock_successful_response("message_id" => "msg_123") }
 
     before do
       allow_any_instance_of(Wittyflow::Client).to receive(:send_flash_sms).and_return(response)
@@ -61,7 +61,7 @@ RSpec.describe Wittyflow::Sms do
 
   describe "#check_sms_status" do
     let(:sms_id) { "msg_123" }
-    let(:response) { mock_successful_response(status: "delivered") }
+    let(:response) { mock_successful_response("status" => "delivered") }
 
     before do
       allow_any_instance_of(Wittyflow::Client).to receive(:message_status).and_return(response)
@@ -79,7 +79,7 @@ RSpec.describe Wittyflow::Sms do
   end
 
   describe "#account_balance" do
-    let(:response) { mock_successful_response(balance: 100.50, currency: "GHS") }
+    let(:response) { mock_successful_response("balance" => 100.50, "currency" => "GHS") }
 
     before do
       allow_any_instance_of(Wittyflow::Client).to receive(:account_balance).and_return(response)

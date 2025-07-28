@@ -2,58 +2,58 @@
 
 RSpec.describe Wittyflow do
   it "has a version number" do
-    expect(Wittyflow::VERSION).not_to be nil
+    expect(Wittyflow::VERSION).not_to be_nil
     expect(Wittyflow::VERSION).to match(/\A\d+\.\d+\.\d+\z/)
   end
 
   describe ".configure" do
     it "yields a configuration object" do
-      expect { |block| Wittyflow.configure(&block) }.to yield_with_args(Wittyflow::Configuration)
+      expect { |block| described_class.configure(&block) }.to yield_with_args(Wittyflow::Configuration)
     end
 
     it "sets the configuration" do
-      config = Wittyflow.configure do |c|
+      config = described_class.configure do |c|
         c.app_id = "test_id"
         c.app_secret = "test_secret"
       end
 
-      expect(Wittyflow.configuration).to eq(config)
-      expect(Wittyflow.configuration.app_id).to eq("test_id")
-      expect(Wittyflow.configuration.app_secret).to eq("test_secret")
+      expect(described_class.configuration).to eq(config)
+      expect(described_class.configuration.app_id).to eq("test_id")
+      expect(described_class.configuration.app_secret).to eq("test_secret")
     end
 
     it "returns existing configuration when called without block" do
-      Wittyflow.configure do |c|
+      described_class.configure do |c|
         c.app_id = "test_id"
       end
 
-      config = Wittyflow.configure
+      config = described_class.configure
       expect(config.app_id).to eq("test_id")
     end
   end
 
   describe ".config" do
     it "returns configuration" do
-      Wittyflow.configure do |c|
+      described_class.configure do |c|
         c.app_id = "test_id"
       end
 
-      expect(Wittyflow.config.app_id).to eq("test_id")
+      expect(described_class.config.app_id).to eq("test_id")
     end
 
     it "creates new configuration if none exists" do
-      expect(Wittyflow.config).to be_a(Wittyflow::Configuration)
+      expect(described_class.config).to be_a(Wittyflow::Configuration)
     end
   end
 
   describe ".new (backward compatibility)" do
     it "creates a new Client instance" do
-      client = Wittyflow.new("app_id", "app_secret")
+      client = described_class.new("app_id", "app_secret")
       expect(client).to be_a(Wittyflow::Client)
     end
 
     it "passes options to the client" do
-      client = Wittyflow.new("app_id", "app_secret", timeout: 60)
+      client = described_class.new("app_id", "app_secret", timeout: 60)
       expect(client.config.timeout).to eq(60)
     end
   end
