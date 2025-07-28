@@ -1,8 +1,113 @@
-/.bundle/
-/.yardoc
-/_yardoc/
+# Ruby
+*.gem
+*.rbc
+/.config
 /coverage/
-/doc/
+/InstalledFiles
 /pkg/
 /spec/reports/
+/spec/examples.txt
+/test/tmp/
+/test/version_tmp/
 /tmp/
+.rspec_status
+
+# Bundler
+vendor/bundle
+.bundle
+
+# RubyGems
+Gemfile.lock
+
+# Environment variables
+.env
+.env.local
+.env.*.local
+
+# Documentation
+/doc/
+/.yardoc/
+/_yardoc/
+/yard/
+
+# IDE files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# RSpec
+/spec/fixtures/vcr_cassettes/
+
+# Coverage reports
+/coverage.data
+/coverage/
+
+# SimpleCov
+.resultset.json
+
+# Guard
+/Guardfile.lock
+
+# Pry
+.pry_history
+
+# Byebug
+.byebug_history
+
+# RuboCop
+.rubocop-*
+
+# Vim
+*.swp
+*.swo
+
+# Emacs
+*~
+\#*\#
+/.emacs.desktop
+/.emacs.desktop.lock
+*.elc
+auto-save-list
+tramp
+.\#*
+
+# MacOS
+.AppleDouble
+.LSOverride
+
+# Thumbnails
+._*
+
+# Files that might appear in the root of a volume
+.DocumentRevisions-V100
+.fseventsd
+.Spotlight-V100
+.TemporaryItems
+.Trashes
+.VolumeIcon.icns
+.com.apple.timemachine.donotpresent
+
+# Directories potentially created on remote AFP share
+.AppleDB
+.AppleDesktop
+Network Trash Folder
+Temporary Items
+.apdisk
+
+# Built gem
+*.gem
+
+# Backup files
+*.bak
+*.backup
