@@ -38,6 +38,7 @@ Gem::Specification.new do |spec|
   # Runtime dependencies
   spec.add_dependency "httparty", "~> 0.21.0"
   spec.add_dependency "zeitwerk", "~> 2.6"
+  spec.add_dependency "csv", "~> 3.2"
 
   # Development dependencies
   spec.add_development_dependency "guard", "~> 2.18"
