@@ -95,7 +95,8 @@ RSpec.describe Wittyflow::Client do
     end
 
     it "formats phone number correctly" do
-      expect_any_instance_of(described_class).to receive(:format_phone_number).with(to).and_return(formatted_phone_number)
+      expect_any_instance_of(described_class)
+        .to receive(:format_phone_number).with(to).and_return(formatted_phone_number)
       client.send_sms(from: from, to: to, message: message)
     end
 

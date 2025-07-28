@@ -158,7 +158,10 @@ module Wittyflow
           raise NetworkError, "Network error after #{config.retries} attempts: #{e.message}"
         end
 
-        config.logger&.warn("Request failed (attempt #{attempts}/#{config.retries}), retrying in #{config.retry_delay}s: #{e.message}")
+        config.logger&.warn(
+          "Request failed (attempt #{attempts}/#{config.retries}), " \
+          "retrying in #{config.retry_delay}s: #{e.message}"
+        )
         sleep(config.retry_delay)
         retry
       rescue Wittyflow::Error => e

@@ -9,7 +9,9 @@ Gem::Specification.new do |spec|
   spec.email         = ["micnkru@gmail.com"]
 
   spec.summary       = "A production-ready Ruby gem for sending SMS via Wittyflow API"
-  spec.description   = "Wittyflow is a robust, well-tested Ruby gem for integrating with the Wittyflow SMS service. Features include SMS sending, delivery tracking, account balance checking, retry logic, and comprehensive error handling."
+  spec.description   = "Wittyflow is a robust, well-tested Ruby gem for integrating with the Wittyflow SMS service. " \
+                       "Features include SMS sending, delivery tracking, account balance checking, retry logic, " \
+                       "and comprehensive error handling."
   spec.homepage      = "https://github.com/charlesagyemang/wittyflow_sms_ruby_gem"
   spec.license       = "MIT"
   spec.required_ruby_version = ">= 3.0.0"
@@ -35,10 +37,10 @@ Gem::Specification.new do |spec|
   spec.executables   = spec.files.grep(%r{\Aexe/}) { |f| File.basename(f) }
   spec.require_paths = ["lib"]
 
-  # Runtime dependencies
+  # Runtime dependencies (alphabetically ordered)
+  spec.add_dependency "csv", "~> 3.2"
   spec.add_dependency "httparty", "~> 0.21.0"
   spec.add_dependency "zeitwerk", "~> 2.6"
-  spec.add_dependency "csv", "~> 3.2"
 
   # Development dependencies
   spec.add_development_dependency "guard", "~> 2.18"
