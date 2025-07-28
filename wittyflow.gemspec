@@ -19,9 +19,9 @@ Gem::Specification.new do |spec|
   spec.metadata["allowed_push_host"] = "https://rubygems.org"
   spec.metadata["homepage_uri"] = "https://github.com/charlesagyemang/wittyflow_sms_ruby_gem"
   spec.metadata["source_code_uri"] = "https://github.com/charlesagyemang/wittyflow_sms_ruby_gem"
-  spec.metadata["changelog_uri"] = "https://github.com/charlesagyemang/wittyflow_sms_ruby_gem/blob/main/CHANGELOG.md"
+  spec.metadata["changelog_uri"] = "https://github.com/charlesagyemang/wittyflow_sms_ruby_gem/blob/master/CHANGELOG.md"
   spec.metadata["bug_tracker_uri"] = "https://github.com/charlesagyemang/wittyflow_sms_ruby_gem/issues"
-  spec.metadata["documentation_uri"] = "https://github.com/charlesagyemang/wittyflow_sms_ruby_gem/blob/main/README.md"
+  spec.metadata["documentation_uri"] = "https://github.com/charlesagyemang/wittyflow_sms_ruby_gem/blob/master/README.md"
   spec.metadata["rubygems_mfa_required"] = "true"
 
   # Specify which files should be added to the gem when it is released.
